@@ -1,0 +1,146 @@
+{
+  "hediet.vscode-drawio.local-storage": "eyIuZHJhd2lvLWNvbmZpZyI6IntcImxhbmd1YWdlXCI6XCJcIixcImN1c3RvbUZvbnRzXCI6W10sXCJsaWJyYXJpZXNcIjpcImdlbmVyYWw7YmFzaWM7YXJyb3dzMjtmbG93Y2hhcnQ7ZXI7dW1sO2F3czQ7Y2l0cml4O2t1YmVybmV0ZXM7bmV0d29yazticG1uXCIsXCJjdXN0b21MaWJyYXJpZXNcIjpbXCJMLnNjcmF0Y2hwYWRcIl0sXCJwbHVnaW5zXCI6W10sXCJyZWNlbnRDb2xvcnNcIjpbXSxcImZvcm1hdFdpZHRoXCI6MjQwLFwiY3JlYXRlVGFyZ2V0XCI6ZmFsc2UsXCJwYWdlRm9ybWF0XCI6e1wieFwiOjAsXCJ5XCI6MCxcIndpZHRoXCI6ODI3LFwiaGVpZ2h0XCI6MTE2OX0sXCJzZWFyY2hcIjp0cnVlLFwic2hvd1N0YXJ0U2NyZWVuXCI6dHJ1ZSxcImdyaWRDb2xvclwiOlwiI2QwZDBkMFwiLFwiZGFya0dyaWRDb2xvclwiOlwiIzZlNmU2ZVwiLFwiYXV0b3NhdmVcIjp0cnVlLFwicmVzaXplSW1hZ2VzXCI6bnVsbCxcIm9wZW5Db3VudGVyXCI6MCxcInZlcnNpb25cIjoxOCxcInVuaXRcIjoxLFwiaXNSdWxlck9uXCI6ZmFsc2UsXCJ1aVwiOlwiXCJ9In0=",
+  "files.autoSave": "afterDelay",
+  "remote.SSH.remotePlatform": {
+      "master": "linux"
+  },
+  "remote.SSH.configFile": "C:/Users/itsuki/.ssh/config",
+  "pasteImage.path": "${currentFileDir}/markdown/images",
+  "editor.tabSize": 2,
+  "editor.cursorStyle": "line",
+  "workbench.tree.indent": 20
+
+
+  // Vim like!
+  // // vim (https://wonwon-eater.com/vscode-vim/)
+  // "vim.camelCaseMotion.enable": true, // leaer->オペレータでCamel単位で選択
+  // "vim.easymotion": true, // 文字列カーソルジャンプ拡張機能
+  // "vim.easymotionKeys": "asdfghjklwertuiop", // easymotionの候補キーを設定
+  // "vim.easymotionMarkerFontFamily": "Myrica M", // easymotionのフォントを変更
+  // "vim.foldfix": true, // 折りたたみ箇所を開かないように変更
+  // "vim.gdefault": true, // replaceコマンドの/gオプションを省略
+  // "vim.highlightedyank.enable": true, // camelCaseMotionを有効化
+  // "vim.hlsearch": true, // 検索マッチ箇所をハイライト
+  // "vim.ignorecase": true, // ignorecaseを有効化
+  // "vim.incsearch": true, // incsearchを有効化
+  // "vim.leader": "<space>", // leaderキーを設定
+  // "vim.sneak": true, // s[S]から二文字で該当箇所へジャンプ
+  // "vim.sneakUseIgnorecaseAndSmartcase": true, // sneak時にignorecase, smartcase設定を使用
+  // "vim.useCtrlKeys": true, // Ctrlキー拡張を有効化
+  // "vim.useSystemClipboard": true, // クリップボードを使用
+  // "vim.visualstar": true, // visualstarを有効化
+  // "vim.insertModeKeyBindings": [
+  //     // Normalモードへ
+  //     { "before": ["j", "k"], "after": ["<ESC>"] },
+  // ],
+  // "vim.normalModeKeyBindingsNonRecursive": [
+  //     // カーソル位置の単語をマルチカーソルで選択
+  //     { "before": [ "<C-n>" ], "after": [ "g", "b" ] },
+  //     { "before": [ "<C-k>" ], "commands": [ "acceptSelectedSuggestion" ] },
+  //     // 前のタブを表示
+  //     { "before": [ "g", "r" ], "after": [ "g", "T" ] },
+  //     // ハイライトクリア
+  //     { "before": [ "<leader>", "\/" ], "commands": [ ":noh" ] },
+  //     // ファイル保存
+  //     { "before": [ "<leader>", "w" ], "commands": [ ":w" ] },
+  //     // プレビュー表示を開いたままにする
+  //     { "before": [ "<leader>", "k" ], "commands": [ "workbench.action.keepEditor" ] },
+  //     // サイドバーの開閉
+  //     { "before": [ "<leader>", "b" ], "commands": [ "workbench.action.toggleSidebarVisibility" ] },
+  //     // 新規ファイル
+  //     { "before": [ "<leader>", "n" ], "commands": [ "workbench.action.files.newUntitledFile" ] },
+  //     // クイックオープンを開く
+  //     { "before": [ "<leader>", "p" ], "commands": [ "workbench.action.quickOpen" ] },
+  //     // ファイル内シンボル検索
+  //     { "before": [ "<leader>", "o" ], "commands": [ "workbench.action.gotoSymbol" ] },
+  //     // ワークスペース内シンボル検索
+  //     { "before": [ "<leader>", "t" ], "commands": [ "workbench.action.showAllSymbols" ] },
+  //     // ファイルエクスプローラーを選択
+  //     { "before": [ "<leader>", "e" ], "commands": [ "workbench.view.explorer" ] },
+  //     // 変数の型定義を参照
+  //     { "before": [ "<leader>", "g", "d" ], "commands": [ "editor.action.goToTypeDefinition" ] },
+  //     // 変数の参照箇所の表示
+  //     { "before": [ "g", "f" ], "commands": [ "editor.action.referenceSearch.trigger" ] },
+  //     // 現在のタブ以外を閉じる
+  //     { "before": [ "<C-w>", "<C-o>" ], "commands": [ ":tabo" ] },
+  //     // 保存＆閉じる
+  //     { "before": ["Z", "Z"], "commands": [ ":wq" ] },
+  //     // 前のタブを表示
+  //     { "before": ["C-h"], "commands": [ "workbench.action.previousEditor" ] },
+  //     // 次のタブを表示
+  //     { "before": ["C-l"], "commands": [ "workbench.action.nextEditor" ] },
+  //     // 前に戻る
+  //     { "before": ["C-o"], "commands": [ "workbench.action.navigateBack" ] },
+  //     // 次に進む
+  //     { "before": ["C-i"], "commands": [ "workbench.action.navigateForward" ] },
+  //     // パネルの開閉
+  //     { "before": ["C-j"], "commands": [ "workbench.action.togglePanel" ] },
+  //     // 上移動
+  //     { "before": ["K"], "after": ["5", "k"] },
+  //     // 下移動
+  //     { "before": ["J"], "after": ["5", "j"] },
+  //     // タブを左に移動
+  //     { "before": ["<leader>", "<"], "commands": [ ":tabm -1" ] },
+  //     // タブを右に移動
+  //     { "before": ["<leader>", ">"], "commands": [ ":tabm +1" ] },
+  // ],
+  // "vim.visualModeKeyBindingsNonRecursive": [
+  //     // カーソル位置の単語をマルチカーソルで選択
+  //     { "before": [ "<C-n>" ], "after": [ "g", "b" ] },
+  //     // 上移動
+  //     { "before": ["K"], "after": ["5", "k"] },
+  //     // 下移動
+  //     { "before": ["J"], "after": ["5", "j"] },
+  // ],
+
+
+
+  // // 既定値を上書きするには、このファイル内にキー バインドを挿入します
+  // [
+  //     {
+  //         "key": "ctrl+oem_comma", // setting.jsonを開く
+  //         "command": "workbench.action.openSettingsJson"
+  //     },
+  //     {
+  //         "key": "f6", // デバッグをカーソル位置まで進めて止める
+  //         "command": "-workbench.action.debug.pause",
+  //         "when": "inDebugMode"
+  //     },
+  //     {
+  //         "key": "f6", // デバッグをカーソル位置まで進めて止める
+  //         "command": "editor.debug.action.runToCursor"
+  //     },
+  //     {
+  //         "key": "ctrl+p", // クイックオープン時の次ファイル選択 (デフォルト削除)
+  //         "command": "-workbench.action.quickOpenNavigateNextInFilePicker",
+  //         "when": "inFilesPicker && inQuickOpen"
+  //     },
+  //     {
+  //         "key": "ctrl+shift+p", // クイックオープン時の前ファイル選択 (デフォルト削除)
+  //         "command": "-workbench.action.quickOpenNavigatePreviousInFilePicker",
+  //         "when": "inFilesPicker && inQuickOpen"
+  //     },
+  //     {
+  //         "key": "ctrl+n", // クイックオープン時の次ファイル選択
+  //         "command": "workbench.action.quickOpenNavigateNextInFilePicker",
+  //         "when": "inFilesPicker && inQuickOpen"
+  //     },
+  //     {
+  //         "key": "ctrl+p", // クイックオープン時の前ファイル選択
+  //         "command": "workbench.action.quickOpenNavigatePreviousInFilePicker",
+  //         "when": "inFilesPicker && inQuickOpen"
+  //     }
+  // ],
+
+
+  // tab (https://www.atmarkit.co.jp/ait/articles/1805/25/news039.html)
+  // [
+  //     {
+  //         "editor.insertSpaces": false,
+  //         "editor.tabSize": 2,
+  //         "editor.detectIndentation": false
+  //     }
+  // ]
+
+}
+

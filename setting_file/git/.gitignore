@@ -1,0 +1,66 @@
+########################################
+# Rails
+########################################
+
+# Ignore bundler config.
+/.bundle
+
+# Ignore bundler gems.
+/vendor/bundle
+
+# Ignore the default SQLite database.
+/db/*.sqlite3
+/db/*.sqlite3-journal
+
+# Ignore all logfiles and tempfiles.
+/log/*.log
+/tmp
+
+# Ignore other unneeded files.
+doc/
+*.swp
+*~
+.project
+.secret
+.env
+
+# Mac
+.DS_Store
+
+# Rubymine
+.idea
+
+# VsCode
+.vscode
+
+
+
+########################################
+# Terraform
+########################################
+#  Local .terraform directories
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# .tfvars files
+*.tfvars
+
+# Mac
+.DS_Store
+
+# VsCode
+.vscode
+
+# myk
+output
+
+
+############################################################
+
+rule: https://qiita.com/anqooqie/items/110957797b3d5280c44f
+
+############################################################
+
