@@ -142,14 +142,14 @@ Slave_IO_Running: Yes、Slave_SQL_Running: Yesだったら設定OK!
 
 疎通確認
 ```
-$ curl -vv telnet://<master_ip>:3306 --output /dev/null
+$ curl -vv telnet://10.0.21.20:3306 --output /dev/null
 ```
 ネットワーク関係ならAWS側の設定を確認。今回はセキュリティでのインバウンド設定に不備。
 もう一度疎通確認してOKなら、再度statusコマンド再度実行。
 
 
 ```
-mysql> show slave status\G
+> show slave status\G
 *************************** 1. row ***************************
                Slave_IO_State: Waiting for master to send event
                   Master_Host: 10.0.21.20
@@ -238,20 +238,20 @@ zabbix起動。
 #### スレーブSQL設定(マスターからのSQLアクセスを許可)
 ```
 スレーブ
-mysql> create user 'master_for_dump'@'10.0.21.20' identified by 'password';
-mysql> grant all on *.* to 'master_for_dump'@'10.0.21.20';
-mysql> flush privileges;
+> create user 'master_for_dump'@'10.0.21.20' identified by 'password';
+> grant all on *.* to 'master_for_dump'@'10.0.21.20';
+> flush privileges;
 
 マスター
 $ mysql -u master_for_dump -p -h 10.0.11.20
-mysql> OK! 一旦exit
+> OK! 一旦exit
 ```
 
 #### Dump実装
 ```
 <読み込み停止>
 マスター
-mysql> FLUSH TABLES WITH READ LOCK;
+> FLUSH TABLES WITH READ LOCK;
 
 <スレーブにデータベース作成後、データベースDump、マスターのデータベース内容をスレーブへエクスポート>
 マスター
@@ -259,9 +259,9 @@ $ mysqladmin -u master_for_dump -p -h 10.0.11.20 create zabbix    ①チェッ�
 $ mysqldump -h localhost -u root -p --databases zabbix > ./zabbix_dump.sql
 $ mysql -u master_for_dump -p -h 10.0.11.20 < ./zabbix_dump.sql   ②チェック
 --------------------------------------------------------------------
-チェック
-master_mysql> show databases; use zabbix; show tables;
-slave_mysql> ①show databases; use zabbix; ②show tables;
+随時チェック
+マスター> show databases; use zabbix; show tables;
+スレーブ> ①show databases; use zabbix; ②show tables;
 --------------------------------------------------------------------
 
 <読み込み停止を解除>
