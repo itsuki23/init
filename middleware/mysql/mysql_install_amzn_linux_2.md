@@ -1,53 +1,40 @@
-# MySQL Replication & Dump
-
-# Provisioning
+# MySQLレプリケーションとダンプ
 ```
-テスト
-AWS EC2*2
-MySQL5.7
-user: root
-pass: root
+<AWS>
+EC2_01: zabbix server  10.0.20.20
+EC2_02: mysql master   10.0.21.20
+EC2_03: mysql slave    10.0.11.20
 
-基本インストール方法
-https://qiita.com/2no553/items/952dbb8df9a228195189
-
-パスワード変更
-https://qiita.com/RyochanUedasan/items/9a49309019475536d22a
+zabbix 4.0
+mysql  5.7
 ```
 
+# レプリケーション
 
 
-# Replication
-https://dev.mysql.com/doc/refman/5.6/ja/replication.html
-
-チェックリスト
+#### 作業フロー
 ```
 step1
-  master
-    binary log on!              [my.cnf/ log-bin]  => [master status/ File: ip-10-0-21-20-bin.000001]
-    set id                      [my.cnf/ server-id=1]
-  slave
-    set id                      [my.cnf/ server-id=2]
+  master: ① binary log on!  ② set id
+  slave : ③ set id
 
 step2
-  master
-    create user for slave       [mysql> grant replication slave on *.* to 'repl'@'10...]
-    check binary log position   [master status/ Position: 446]
-
+  master: ④ create user for slave  ⑤ check binary log & position
+  slave : ⑥ master setting
 ```
 
-- master
+#### ファイル設定
+[master]
 ```
 $ sudo vi etc/my.cnf
   [mysqld]
-  log-bin
+  log-bin 
   server-id=1
-  # log-bin=mysql-bin   prefixをつけられる
 
 $ systemctl restart mysqld
 ```
 
-- slave
+[slave]
 ```
 $ sudo vi etc/my.cnf
   [mysqld]
@@ -56,7 +43,8 @@ $ sudo vi etc/my.cnf
 $ systemctl restart mysqld
 ```
 
-- master
+#### SQL設定
+[master]
 ```
 > grant replication slave on *.* to 'repl'@'10.0.11.20' identified by 'repl';
 
@@ -81,8 +69,7 @@ Executed_Gtid_Set:
 1 row in set (0.00 sec)
 ```
 
-
-- slave
+[slave]
 ```
 > change master to master_host = '10.0.21.20',master_user = 'repl',master_password = 'repl',master_log_file = 'ip-10-0-21-20-bin.000001',master_log_pos = 446;
 
@@ -150,16 +137,17 @@ Master_SSL_Verify_Server_Cert: No
 1 row in set (0.00 sec)
 ```
 
-Slave_IO_Running: Yes、Slave_SQL_Running: Yesだったら設定OK!つまり上記NG。
+Slave_IO_Running: Yes、Slave_SQL_Running: Yesだったら設定OK!
+つまり上記NG。
 
 疎通確認
 ```
 $ curl -vv telnet://<master_ip>:3306 --output /dev/null
 ```
 ネットワーク関係ならAWS側の設定を確認。今回はセキュリティでのインバウンド設定に不備。
-もう一度疎通確認してOKなら、statusコマンド再度実行。
+もう一度疎通確認してOKなら、再度statusコマンド再度実行。
 
-もう一度
+
 ```
 mysql> show slave status\G
 *************************** 1. row ***************************
@@ -223,72 +211,67 @@ Master_SSL_Verify_Server_Cert: No
 1 row in set (0.00 sec)
 ```
 OK!
+マスターでテーブル作成をして、スレーブにもレプリケートされてたら問題なし。
 
 
 
-## Dump
-- 現状確認
+
+
+
+# ダンプ
+
+#### 作業フロー
 ```
-master
-###########################################################
+slaveを停止。(略)
+zabbixとmasterで通常設定。(略)
+zabbix停止。(略)
 
-mysql> show databases;
-+--------------------+
-| Database           |
-+--------------------+
-| information_schema |
-| mysql              |
-| performance_schema |
-| sys                |
-| zabbix             |
-+--------------------+
-5 rows in set (0.00 sec)
+Dump設定。(ここから！)
+masterのzabbixテーブルをslaveにインポート。
+zabbix起動。
 
-mysql> select Host, User from mysql.user;
-+------------+---------------+
-| Host       | User          |
-+------------+---------------+
-| %          | zabbix        |
-| 10.0.11.20 | repl          |
-| localhost  | mysql.session |
-| localhost  | mysql.sys     |
-| localhost  | root          |
-+------------+---------------+
-5 rows in set (0.00 sec)
-
-mysql> show master status\G
-*************************** 1. row ***************************
-             File: ip-10-0-21-20-bin.000002
-         Position: 539634
-     Binlog_Do_DB:
- Binlog_Ignore_DB:
-Executed_Gtid_Set:
-1 row in set (0.00 sec)
+確認。
+```
+[zabbix設定](#anchor1)
 
 
-slave
-###########################################################
-mysql> show databases;
-+--------------------+
-| Database           |
-+--------------------+
-| information_schema |
-| mysql              |
-| performance_schema |
-| sys                |
-+--------------------+
-4 rows in set (0.00 sec)
+#### スレーブSQL設定(マスターからのSQLアクセスを許可)
+```
+スレーブ
+mysql> create user 'master_for_dump'@'10.0.21.20' identified by 'password';
+mysql> grant all on *.* to 'master_for_dump'@'10.0.21.20';
+mysql> flush privileges;
 
-mysql> select Host, User from mysql.user;
-+-----------+---------------+
-| Host      | User          |
-+-----------+---------------+
-| localhost | mysql.session |
-| localhost | mysql.sys     |
-| localhost | root          |
-+-----------+---------------+
-3 rows in set (0.00 sec)
+マスター
+$ mysql -u master_for_dump -p -h 10.0.11.20
+mysql> OK! 一旦exit
+```
 
+#### Dump実装
+```
+<読み込み停止>
+マスター
+mysql> FLUSH TABLES WITH READ LOCK;
+
+<スレーブにデータベース作成後、データベースDump、マスターのデータベース内容をスレーブへエクスポート>
+マスター
+$ mysqladmin -u master_for_dump -p -h 10.0.11.20 create zabbix    ①チェック
+$ mysqldump -h localhost -u root -p --databases zabbix > ./zabbix_dump.sql
+$ mysql -u master_for_dump -p -h 10.0.11.20 < ./zabbix_dump.sql   ②チェック
+--------------------------------------------------------------------
+チェック
+master_mysql> show databases; use zabbix; show tables;
+slave_mysql> ①show databases; use zabbix; ②show tables;
+--------------------------------------------------------------------
+
+<読み込み停止を解除>
+mysql> UNLOCK TABLES;
+```
+
+#### zabbix起動（略）
+#### 確認
+```
+スレーブ
 mysql> show slave status\G
 *************************** 1. row ***************************
                Slave_IO_State: Waiting for master to send event
@@ -297,84 +280,60 @@ mysql> show slave status\G
                   Master_Port: 3306
                 Connect_Retry: 60
               Master_Log_File: ip-10-0-21-20-bin.000002
-          Read_Master_Log_Pos: 587412
-               Relay_Log_File: ip-10-0-11-20-relay-bin.000005
-                Relay_Log_Pos: 383
+          Read_Master_Log_Pos: 1099051
+               Relay_Log_File: ip-10-0-11-20-relay-bin.000007
+                Relay_Log_Pos: 98583
         Relay_Master_Log_File: ip-10-0-21-20-bin.000002
              Slave_IO_Running: Yes
-            Slave_SQL_Running: No
-              Replicate_Do_DB:
-          Replicate_Ignore_DB:
-           Replicate_Do_Table:
-       Replicate_Ignore_Table:
-      Replicate_Wild_Do_Table:
-  Replicate_Wild_Ignore_Table:
-                   Last_Errno: 1146
-                   Last_Error: Error executing row event: 'Table 'zabbix.history' doesn't exist'
-                 Skip_Counter: 0
-          Exec_Master_Log_Pos: 154
-              Relay_Log_Space: 588030
-              Until_Condition: None
-               Until_Log_File:
-                Until_Log_Pos: 0
-           Master_SSL_Allowed: No
-           Master_SSL_CA_File:
-           Master_SSL_CA_Path:
-              Master_SSL_Cert:
-            Master_SSL_Cipher:
-               Master_SSL_Key:
-        Seconds_Behind_Master: NULL
-Master_SSL_Verify_Server_Cert: No
-                Last_IO_Errno: 0
-                Last_IO_Error:
-               Last_SQL_Errno: 1146
-               Last_SQL_Error: Error executing row event: 'Table 'zabbix.history' doesn't exist'
-  Replicate_Ignore_Server_Ids:
-             Master_Server_Id: 1
-                  Master_UUID: 270ec95b-d7a2-11ea-b55a-0a9dc8630d08
-             Master_Info_File: /var/lib/mysql/master.info
-                    SQL_Delay: 0
-          SQL_Remaining_Delay: NULL
-      Slave_SQL_Running_State:
-           Master_Retry_Count: 86400
-                  Master_Bind:
-      Last_IO_Error_Timestamp:
-     Last_SQL_Error_Timestamp: 200807 00:59:37
-               Master_SSL_Crl:
-           Master_SSL_Crlpath:
-           Retrieved_Gtid_Set:
-            Executed_Gtid_Set:
-                Auto_Position: 0
-         Replicate_Rewrite_DB:
-                 Channel_Name:
-           Master_TLS_Version:
-1 row in set (0.00 sec)
+            Slave_SQL_Running: Yes
+                               ...
 ```
+今回は手順ミスでコンフリクトが起きたので、
+以下参考欄「ダンプ後のエラー処理」を参考に対処。解決。
+確認として、マスター側でテーブル作成。スレーブ側でも作成されていれば問題なし。
 
-- master
-```
-$ mysqldump -h localhost -u root -p --all-databases --master-data > 20200807_dump.sql
-option: http://www.tohoho-web.com/ex/mysql-mysqldump.html
-```
 
-https://www.sejuku.net/blog/82770
-http://www.tohoho-web.com/ex/mysql-mysqldump.html
 
-異なるサーバー間のMySQLデータのコピー
+
+# 参考
+#### MySQL
+基本インストール方法
+https://qiita.com/2no553/items/952dbb8df9a228195189
+
+パスワード変更(テスト用)
+https://qiita.com/RyochanUedasan/items/9a49309019475536d22a
+
+#### レプリケーション
+ドキュメント
+https://dev.mysql.com/doc/refman/5.6/ja/replication.html
+その他
+https://utage.headwaters.co.jp/blog/archives/4958
+https://zatoima.github.io/mysql-aws-ec2-replication.html
+
+MySQLのbinlog設定値
+https://shiro-16.hatenablog.com/entry/2016/06/12/154343
+
+#### ダンプ
+MySQL データベースのほかのマシンへのコピー
 https://dev.mysql.com/doc/refman/5.6/ja/copying-databases.html
+ダンプ後のエラー処理
+http://www.maruko2.com/mw/MySQL_スレーブで_SQL_スレッドが停止した場合の対処方法
+バックアップ・リストア
+http://www.tohoho-web.com/ex/mysql-mysqldump.html
+その他
+https://www.sejuku.net/blog/82770
+
+#### 今後リサーチ
+zabbixによるmysqlレプリケーション監視設定
+https://blog.apar.jp/zabbix/3218/
+
+Dumpするファイル形式は .db? .sql? 今回は.sqlで対応。
+https://dev.mysql.com/doc/refman/5.6/ja/replication-howto-mysqldump.html
 
 
 
-
-
-
-
-## Zabbix
-※別のサーバーから3306ポートでアクセスするならmysqlで設定しないとconnectエラーになる。下記「%」のとこ。
-```
-mysql> GRANT ALL PRIVILEGES ON *.* TO root@'%' IDENTIFIED BY 'rootのpass' WITH GRANT OPTION;
-```
-
+# メモ
+#### Zabbix  <a id="anchor1"></a>
 - DB_masterでmysqlの設定
 ```
 mysql -u root -p
@@ -399,19 +358,9 @@ mysql -u zabbix -h <private_ip> -p
 sudo zcat /usr/share/doc/zabbix-server-mysql*/create.sql.gz | mysql -u zabbix -h <private_ip> -p zabbix
 ...
 ```
+- メモ。db_master_server側で以下の設定してもいい。dbアクセスが後々楽に。
+```
+db_server_mysql> GRANT ALL PRIVILEGES ON *.* TO root@'%' IDENTIFIED BY 'rootのpass' WITH GRANT OPTION;
 
-# 参考
-https://utage.headwaters.co.jp/blog/archives/4958
-https://zatoima.github.io/mysql-aws-ec2-replication.html
-
-
-
-
-ex
-http://www.maruko2.com/mw/MySQL_スレーブで_SQL_スレッドが停止した場合の対処方法
-https://qiita.com/yamotuki/items/2d1c74c3253e9c3b0562
-https://dev.mysql.com/doc/refman/5.6/ja/copying-databases.html
-https://www.it-swarm.dev/ja/mysql/mysqldumpエラー1045正しいパスワードなどにもかかわらずアクセスが拒否されました/1043190719/
-http://www.tohoho-web.com/ex/mysql-mysqldump.html
-https://dev.mysql.com/doc/refman/5.6/ja/replication-howto-mysqldump.html
-
+上記「%」のとこ。
+```
