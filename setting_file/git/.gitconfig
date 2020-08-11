@@ -1,3 +1,32 @@
 [user]
-	name =
-	email =
+	name = ..
+	email = ..
+
+# [core]
+# 	excludesfile = /Users/mac/.gitignore_global
+# 	editor = vi
+
+[color]
+	ui = true
+	diff = auto
+	status = auto
+	branch = auto
+
+[alias]
+	co = commit
+	st = status
+	br = branch
+	ch = checkout
+    graph = log --graph --date-order -C -M --pretty=format:\"<%h> %ad [%an] %Cgreen%d%Creset %s\" --all --date=short
+	# graph = log --online --abbrev-commit --all --graph
+[secrets]
+	providers = git secrets --aws-provider
+
+	...
+[init]
+
+# [filter "lfs"]
+# 	clean = git-lfs clean -- %f
+# 	smudge = git-lfs smudge -- %f
+# 	process = git-lfs filter-process
+# 	required = true
