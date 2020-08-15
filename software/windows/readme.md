@@ -11,6 +11,11 @@
 ・VartualBox, Vagrant...etcもWSL側で設定
 ```
 
+# Tmux
+```
+sudo apt install tmux
+```
+
 # VirtualBox
 VirtualBox-6.1.10-138449-Win.exe
 ※ Hyper V: off -> Docker for Windows: off

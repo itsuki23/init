@@ -73,6 +73,7 @@ xterm*|rxvt*)
 esac
 
 # enable color support of ls and also add handy aliases
+# what dose [-color] mean: https://www.mm2d.net/main/prog/linux/ls-08.html
 if [ -x /usr/bin/dircolors ]; then
     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
     alias ls='ls --color=auto'
@@ -91,6 +92,12 @@ fi
 alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
+
+# git alias
+alias st='status'
+alias bh='branch'
+alias co='commit'
+alias ch='checkout'
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
@@ -116,26 +123,18 @@ if ! shopt -oq posix; then
   fi
 fi
 
-
-
-##########
-##########
-########## for vagrant
-
+# for vagrant
 export VAGRANT_WSL_WINDOWS_ACCESS_USER="itsuki"
 export VAGRANT_WSL_ENABLE_WINDOWS_ACCESS="1"
-#/mnt/c/[任意のDir名]でもOK
 export VAGRANT_WSL_WINDOWS_ACCESS_USER_HOME_PATH="/mnt/c/.vagrant.d.wsl"
 export PATH="$PATH:/mnt/c/Program Files/Oracle/VirtualBox"
 export PATH="$PATH:/mnt/c/Windows/System32/"
 export PATH="$PATH:/mnt/c/Windows/System32/WindowsPowerShell/v1.0/"
 
-########## for terraform tflint
+# for terraform tflint
 export PATH="$PATH:/mnt/c/HashiCorp/terraform"
-##########
-########## for terminal カスタマイズ
-########## https://docs.microsoft.com/ja-jp/windows/terminal/tutorials/powerline-setup
 
+# Powerline 
 #GOPATH=$HOME/go
 #function _update_ps1() {
 #    # org: PS1="$($GOPATH/bin/powerline-go -error $?)"
@@ -146,8 +145,28 @@ export PATH="$PATH:/mnt/c/HashiCorp/terraform"
 #    PROMPT_COMMAND="_update_ps1; $PROMPT_COMMAND"
 #fi
 
-##########
-##########
-##########
+# prompt add git branch
+function parse_git_branch {
+    git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ [\1]/'
+}
+function promps {
+    local  BLUE="\[\e[1;34m\]"
+    local  RED="\[\e[1;31m\]"
+    local  GREEN="\[\e[1;32m\]"
+    local  WHITE="\[\e[00m\]"
+    local  GRAY="\[\e[1;37m\]"
+
+    case $TERM in
+        xterm*) TITLEBAR='\[\e]0;\W\007\]';;
+        *)      TITLEBAR="";;
+    esac
+    local BASE="\u@\h"
+    PS1="${TITLEBAR}${GREEN}${BASE}${WHITE}:${BLUE}\W${GREEN}\$(parse_git_branch)${BLUE}\$${WHITE} "
+}
+promps
+
+
+
+
 
 
